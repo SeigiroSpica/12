@@ -1,0 +1,89 @@
+public class CursoEspecial extends Curso{
+private float notaMinimaTrabajo ;
+public CursoEspecial( String nombre , String modalidad , float
+minimoNotaCursada , float minimoNotaTrabajo ) {
+super ( nombre , modalidad , minimoNotaCursada );
+this . notaMinimaTrabajo = minimoNotaTrabajo ;
+}
+public float getNotaMinimaTrabajo() {
+return notaMinimaTrabajo ;
+}
+public void setNotaMinimaTrabajo( float notaMinimaTrabajo ) {
+this . notaMinimaTrabajo = notaMinimaTrabajo ;
+}
+}
+
+***
+
+En la clase Curso
+public float obtenerCalificacionCurso(List<Float> notas ) {
+return notas .get(0);
+}
+public boolean apruebaCurso(List<Float> notas ) {
+if (obtenerCalificacionCurso( notas )>= this . minimoNotaCurso ) return true ;
+return false ;
+}
+En la Clase CursoEspecial
+@Override
+public boolean apruebaCurso(List<Float> notas ) {
+float promedio =0;
+promedio =obtenerCalificacionCurso( notas );
+if ( super .apruebaCurso( notas ) && ( promedio >= this . notaMinimaTrabajo ))
+return true ;
+return false ;
+}
+@Override
+public float obtenerCalificacionCurso(List<Float> notas ) {
+float notaTrabajoEspecial =0;
+for ( int i =1; i < notas .size(); i ++)
+notaTrabajoEspecial += notas .get( i );
+notaTrabajoEspecial /= notas .size()-1;
+return notaTrabajoEspecial ;
+}
+
+*********
+
+En la clase Instructor
+/** El método agrega una nueva capacitacion en la lista de capacitaciones del Instructor solo si
+no se ha superado el cupo del Instructor para capacitarse en cursos con modalidad “virtual”.
+*
+* @param nuevaCapacitacion capacitacion a agregar a la lista de capacitaciones
+* @return devuelve true en caso de poder agregar la capacitacion y false en caso contrario
+*/
+public boolean inscribirACurso (Capacitacion nueva Capacitacion ) {
+Curso c = nueva Capacitacion .getCurso();
+if ( c .getModalidad().equals( "Virtual" ))
+{
+if (getCantidadCursosModalidad( "Virtual" )< this . cupoModalidadVirtual )
+{
+this . capacitaciones .add( nueva Capacitacion );
+return true ;
+}
+else return false ;
+} else
+{
+this . capacitaciones .add( nueva Capacitacion );
+return true ;
+}
+}
+private int getCantidadCursosModalidad(String modalidad ) {
+int cantidadVirtuales =0;
+Iterator<Capacitacion> iterador = this . capacitaciones .iterator();
+while ( iterador .hasNext()) {
+Capacitacion capacitacion = iterador .next();
+Curso curso = capacitacion .getCurso();
+if ( curso .getModalidad().equals( modalidad ))
+cantidadVirtuales +=1;
+}
+return cantidadVirtuales ;
+}
+
+
+***************
+
+SELECT I.DNI, AVG (CP.nota) AS Promedio FROM
+Instructor I JOIN Capacitacion CP ON I.DNI = CP.Instructor_DNI
+JOIN Curso C ON C.idCurso=CP.Curso_IdCurso
+WHERE C.modalidad="Presencial"
+GROUP BY (I.DNI)
+ORDER BY (I.DNI) DESC ;
